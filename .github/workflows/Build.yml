@@ -1,0 +1,115 @@
+name: Build
+
+on: [ push, workflow_dispatch ]
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+
+jobs:
+  checkLicense:
+    name: check unity license
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail - No License
+        if: ${{ !startsWith(env.UNITY_LICENSE, '<') }}
+        run: exit 1
+  
+  UnitTests:
+    needs: checkLicense
+    name: ${{ matrix.testMode }} unit tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        testMode:
+          - EditMode
+          - PlayMode
+    
+    steps:
+      - name: check out
+        uses: actions/checkout@v2.3.4
+      
+      - name: Run Tests
+        id: testRunner
+        uses: game-ci/unity-test-runner@v2
+        with:
+          testMode: ${{ matrix.testMode }}
+          checkName: ${{ matrix.testMode }} test results
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: upload test artifacts
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test results ${{ matrix.testMode }}
+          path: ${{ steps.testRunner.outputs.artifactsPath }}
+
+  build-Android:
+    env:
+      build-dir: build-Android
+
+    needs: UnitTests
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: check out
+        uses: actions/checkout@v2.3.4
+
+      - name: Restore Library cache
+        uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-build-Android
+          restore-keys: |
+            Library-build-
+            Library-
+      
+      - name: Build unity project
+        uses: game-ci/unity-builder@v2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          targetPlatform: Android
+      
+      - name: upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.build-dir }}
+          path: build/${{ env.build-dir }}
+  
+#  build-IOS:
+#    env:
+#      build-dir: build-IOS
+#
+#    needs: UnitTests
+#    runs-on: ubuntu-latest
+#
+#    strategy:
+#      fail-fast: false
+#
+#    steps:
+#      - name: check out
+#        uses: actions/checkout@v2.3.4
+#
+#      - name: Restore Library cache
+#        uses: actions/cache@v2
+#        with:
+#          path: Library
+#          key: Library-build-IOS
+#          restore-keys: |
+#            Library-build-
+#            Library-
+#      
+#      - name: Build unity project
+#        uses: game-ci/unity-builder@v2
+#        with:
+#          targetPlatform: IOS
+#      
+#      - name: upload build artifacts
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: ${{ env.build-dir }}
+#          path: build/${{ env.build-dir }}

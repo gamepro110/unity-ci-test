@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using thingGame;
 using UnityEditor;
 using UnityEngine;
@@ -111,3 +112,4 @@ public class ScriptableGunEditor : Editor
    private int ammoMultiplier = 1;
    private ScriptableGun item;
 }
+#endif

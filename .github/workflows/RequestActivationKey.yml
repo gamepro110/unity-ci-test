@@ -1,11 +1,6 @@
 name: Acquire activation file
 
-on:
-  push:
-    branches: 
-      - master
-    tags:
-      - "newUnityLicense"
+on: workflow_dispatch
 
 jobs:
   activation:
@@ -17,7 +12,7 @@ jobs:
         id: getManualLicenseFile
         uses: game-ci/unity-request-activation-file@v2.0-alpha-1
         with:
-          #unityVersion: 2019.3.9f1
+          # multiple unity versions can be listed below
           unityVersion: 2021.1.7f1
       # uploading the artifact 
       - name: Expose as artifact

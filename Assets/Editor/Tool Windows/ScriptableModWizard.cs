@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 using thingGame;
 using System.Linq;
@@ -185,3 +186,4 @@ public class ScriptableModWizard : ScriptableWizard
 
    #endregion variables
 }
+#endif

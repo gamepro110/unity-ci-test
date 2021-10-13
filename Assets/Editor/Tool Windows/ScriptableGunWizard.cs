@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 using thingGame;
 using System.Linq;
@@ -182,3 +183,4 @@ public class ScriptableGunWizard : ScriptableWizard
 
    #endregion variables
 }
+#endif

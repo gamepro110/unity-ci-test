@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using thingGame;
 using UnityEditor;
 
@@ -108,3 +109,4 @@ public class ScriptableModEditor : Editor
 
    private ScriptableMod item;
 }
+#endif
